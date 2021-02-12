@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% block content %}
+    {% include 'navbar.html' %}
+    <div class="container">
+        <h3 class="mt-4">{{ month }}</h3>
+        <div class="row mt-5" >
+            <div class="col-6">
+                <h4>Total Spending Summary</h4><br/>
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th scope="col">Category</th>
+                            <th scope="col">Total Spent</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for category in summary %}
+                            <tr>
+                                <td>{{ category['category'] }}</td>
+                                <td>{{ category['total'] }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-6">
+                <div class="chart" id="pie_chart_total">
+                    <script>
+                        var graphs = {{pie_total | safe}};
+                        Plotly.plot('pie_chart_total',graphs,{},{displaylogo: false, displayModeBar: false});
+                    </script>
+                </div>
+            </div>
+        </div>
+        <h4 class="mt-4">Transactions</h4><br/>
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <th scope="col">Category</th>
+                    <th scope="col">Sub Category</th>
+                    <th scope="col">Description</th>
+                    <th scope="col">Store</th>
+                    <th scope="col">Cost</th>
+                    <th scope="col">Payment Type</th>
+                    <th scope="col">Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for transaction in transactions %}
+                    <tr>
+                        <td>{{ transaction.category }}</td>
+                        <td>{{ transaction.sub_category }}</td>
+                        <td>{{ transaction.description }}</td>
+                        <td>{{ transaction.store }}</td>
+                        <td>{{ transaction.cost }}</td>
+                        <td>{{ transaction.payment_type }}</td>
+                        <td>{{ transaction.date }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
+<style>
+    #pie_chart_total {
+        padding-left: 30px;
+}
+</style>

@@ -1,0 +1,55 @@
+
+{% extends 'base.html' %}
+{% block content %}
+    {% include 'navbar.html' %}
+    <div class="container">
+        <h3 class="mt-4">Dashboard</h3><br/>
+        <div class="row mt-5" >
+            <div class="col-7">
+                <h4>Current Spending Projections </h4><br/>
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th scope="col"></th>
+                            <th scope="col">Ideal Spending</th>
+                            <th scope="col">Spending Remaining</th>
+                            <th scope="col">Projected Spending</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for projection in projections %}
+                            <tr>
+                                <td>{{ projection['label'] }}</td>
+                                <td>{{ projection['ideal_spending'] }}</td>
+                                <td>{{ projection['spending_remaining'] }}</td>
+                                <td>{{ projection['projected_spending'] }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-1">
+            </div>
+            <div class="col-4">
+                <h4>Current Budget</h4><br/>
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th scope="col">Category</th>
+                            <th scope="col">Spending Limit</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for category in budget %}
+                            <tr>
+                                <td>{{ category['label'] }}</td>
+                                <td>{{ category['max'] }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+

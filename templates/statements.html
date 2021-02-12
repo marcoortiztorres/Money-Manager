@@ -1,0 +1,41 @@
+
+{% extends 'base.html' %}
+{% block content %}
+    {% include 'navbar.html' %}
+    <div class="container">
+        <h3 class="mt-4">Monthly Reports</h3><br/><br/>
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <th scope="col">Month</th>
+                    <th scope="col">Starting Balance</th>
+                    <th scope="col">Final Balance</th>
+                    <th scope="col">Savings Balance</th>
+                    <th scope="col">Savings Deposits</th>
+                    <th scope="col">Savings Withdraws</th>
+                    <th scope="col"></th>
+                </tr>
+            </thead>
+            <tbody>
+              {% for report in monthly_reports %}
+              <tr>
+                <td>{{ report.month }}</td>
+                <td>{{ report.starting_bank_balance }}</td>
+                <td>{{ report.final_bank_balance }}</td>
+                <td>{{ report.savings_balance }}</td>
+                <td>{{ report.savings_deposit }}</td>
+                <td>{{ report.savings_withdraw }}</td>
+                <td><a href="/statements/view/{{report.month}}">View</a></td>
+              </tr>
+              {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
+
+<style>
+    .container{
+        padding-bottom: 30px;
+    }
+</style>
+
