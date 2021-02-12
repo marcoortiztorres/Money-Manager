@@ -15,7 +15,9 @@ SAMPLE_RANGE_NAME = 'February!A2:E'
 
 @app.route('/', methods=['GET', 'POST', 'OPTIONS'])
 def index():
+    print("index")
     if google_auth.is_logged_in():
+        print("google_auth")
         yearly_report = google_sheets.get_yearly_report()
 
         monthly_reports = yearly_report.monthly_reports
