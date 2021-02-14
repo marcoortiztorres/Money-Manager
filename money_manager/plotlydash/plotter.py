@@ -1,13 +1,8 @@
+import json
 import plotly
 import plotly.graph_objs as go
 
-import pandas as pd
-import json
-
-CATEGORY_KEY = 'category'
-SUB_CATEGORY_KEY = 'sub category'
-COST_KEY = 'cost'
-DESCRIPTION_KEY = 'description'
+from money_manager.google_drive.objects import *
 
 
 def create_plot(transactions_json, category):

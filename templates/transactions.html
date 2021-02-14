@@ -25,8 +25,8 @@
                     <tbody>
                         {% for category in summary %}
                             <tr>
-                                <td>{{ category['category'] }}</td>
-                                <td>{{ category['total'] }}</td>
+                                <td>{{ category['Category'] }}</td>
+                                <td>{{ category['Cost'] }}</td>
                             </tr>
                         {% endfor %}
                     </tbody>
@@ -42,11 +42,12 @@
                 <table class="table table-sm table-responsive">
                     <thead>
                         <tr>
+                            <th scope="col">Item</th>
+                            <th scope="col">Cost</th>
                             <th scope="col">Category</th>
                             <th scope="col">Sub Category</th>
                             <th scope="col">Description</th>
                             <th scope="col">Store</th>
-                            <th scope="col">Cost</th>
                             <th scope="col">Payment Type</th>
                             <th scope="col">Date</th>
                         </tr>
@@ -54,13 +55,14 @@
                     <tbody>
                         {% for transaction in transactions %}
                             <tr>
-                                <td>{{ transaction.category }}</td>
-                                <td>{{ transaction.sub_category }}</td>
-                                <td>{{ transaction.description }}</td>
-                                <td>{{ transaction.store }}</td>
-                                <td>{{ transaction.cost }}</td>
-                                <td>{{ transaction.payment_type }}</td>
-                                <td>{{ transaction.date }}</td>
+                                <td>{{ transaction['Item'] }}</td>
+                                <td>{{ transaction['Cost'] }}</td>
+                                <td>{{ transaction['Category'] }}</td>
+                                <td>{{ transaction['Sub Category'] }}</td>
+                                <td>{{ transaction['Description'] }}</td>
+                                <td>{{ transaction['Store'] }}</td>
+                                <td>{{ transaction['Payment Type'] }}</td>
+                                <td>{{ transaction['Date'] }}</td>
                             </tr>
                         {% endfor %}
                     </tbody>

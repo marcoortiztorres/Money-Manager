@@ -1,12 +1,20 @@
+# CORE
 flask
 gunicorn
 
+# DB
+flask_sqlalchemy
+flask_script
+flask_migrate
+psycopg2-binary
+
+# Plotly
 pandas
 numpy
 openpyxl
-matplotlib
 dash
 
+# Google
 authlib==0.11
 google-api-python-client
 google-auth

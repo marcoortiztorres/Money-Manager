@@ -11,41 +11,45 @@
                     <thead>
                         <tr>
                             <th scope="col"></th>
-                            <th scope="col">Ideal Spending</th>
-                            <th scope="col">Spending Remaining</th>
+                            <th scope="col">Spending Total</th>
+                            <th scope="col">Budget</th>
+                            <th scope="col">Budget Remaining</th>
                             <th scope="col">Projected Spending</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for projection in projections %}
                             <tr>
-                                <td>{{ projection['label'] }}</td>
-                                <td>{{ projection['ideal_spending'] }}</td>
-                                <td>{{ projection['spending_remaining'] }}</td>
-                                <td>{{ projection['projected_spending'] }}</td>
+                                <td>{{ projection['Category'] }}</td>
+                                <td>{{ projection['Spending Total'] }}</td>
+                                <td>{{ projection['Budget'] }}</td>
+                                <td>{{ projection['Budget Remaining'] }}</td>
+                                <td>{{ projection['Projected Spending'] }}</td>
                             </tr>
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
+
             <div class="table-responsive-sm col-xs-6 col-md-4 order-xs-1">
                 <h4>Current Budget</h4><br/>
                 <table class="table table-sm">
                     <thead>
                         <tr>
                             <th scope="col">Category</th>
-                            <th scope="col">Spending Limit</th>
+                            <th scope="col">Budget</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for category in budget %}
+                        {% for budget in budgets %}
                             <tr>
-                                <td>{{ category['label'] }}</td>
-                                <td>{{ category['max'] }}</td>
+                                <td>{{ budget['Category'] }}</td>
+                                <td>{{ budget['Budget'] }}</td>
                             </tr>
                         {% endfor %}
                     </tbody>
                 </table>
+                <a href="https://docs.google.com/spreadsheets/d/{{ session['sheet_id'] }}/edit#gid=1">Edit Budget</a>
             </div>
         </div>
     </div>
