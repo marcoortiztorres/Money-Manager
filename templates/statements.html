@@ -8,32 +8,28 @@
             <h3 class="mt-4">Monthly Reports</h3><br/><br/>
             </div>
         </div>
-        <div class="row">
-            <div class="col d-flex justify-content-center">
-                <div class="table-responsive-sm">
-                    <table class="table table-sm">
-                        <thead>
-                            <tr>
-                                <th scope="col">Month</th>
-                                <th scope="col">Starting Balance</th>
-                                <th scope="col">Final Balance</th>
-                                <th scope="col">Savings Balance</th>
-                                <th scope="col"></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                          {% for report in monthly_reports %}
-                          <tr>
-                            <td>{{ report['Month'] }}</td>
-                            <td>{{ report['Starting Bank Balance'] }}</td>
-                            <td>{{ report['Final Bank Balance'] }}</td>
-                            <td>{{ report['Savings Balance']}}</td>
-                            <td><a href="/statements/view/{{ report['Month'] }}">View</a></td>
-                          </tr>
-                          {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
+        <div class="row px-3">
+            <div class="col table-responsive-sm d-flex justify-content-center">
+                <table class="table table-sm text-center">
+                    <thead>
+                        <tr>
+                            <th scope="col" class="text-right">Month</th>
+                            <th scope="col">Starting Balance</th>
+                            <th scope="col">Final Balance</th>
+                            <th scope="col">Savings Balance</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                      {% for report in monthly_reports %}
+                      <tr>
+                        <td class="text-right"><a href="/statements/view/{{ report['Month'] }}">{{ report['Month'] }}</a></td>
+                        <td>{{ report['Starting Bank Balance'] }}</td>
+                        <td>{{ report['Final Bank Balance'] }}</td>
+                        <td>{{ report['Savings Balance']}}</td>
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
