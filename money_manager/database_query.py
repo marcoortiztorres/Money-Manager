@@ -7,7 +7,6 @@ SAMPLE_SPREADSHEET_ID = '1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms'
 
 def get_user_sheet(google_id):
     results = query_google_id(google_id)
-    print(results)
     if results is None:
         session['sheet_id'] = get_new_user_sheet(google_id)
     else:
@@ -24,7 +23,6 @@ def get_new_user_sheet(google_id):
     new_sheet_id = create_new_sheet()
     response = add_user(google_id, new_sheet_id)
     session['new_user'] = True
-    print("new user:", response)
     return new_sheet_id
 
 

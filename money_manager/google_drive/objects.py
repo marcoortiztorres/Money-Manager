@@ -9,6 +9,8 @@ ROW_LIMIT = 500
 
 # SUMMARY SHEET
 MONTH_KEY = 'Month'
+SUMMARY_KEY = 'Summary'
+TOTAL_KEY = 'Total'
 STARTING_BANK_BALANCE_KEY = 'Starting Bank Balance'
 FINAL_BANK_BALANCE_KEY = 'Final Bank Balance'
 SAVINGS_BALANCE_KEY = 'Savings Balance'
@@ -27,7 +29,7 @@ COST_KEY = 'Cost'
 CATEGORY_KEY = 'Category'
 SUB_CATEGORY_KEY = 'Sub Category'
 DESCRIPTION_KEY = 'Description'
-STORE_KEY = 'Store'
+STORE_KEY = 'Company'
 PAYMENT_KEY = 'Payment Method'
 DATE_KEY = 'Date'
 
@@ -35,6 +37,13 @@ DATE_KEY = 'Date'
 def get_current_month():
     current_date = datetime.now()
     return current_date.strftime("%B")
+
+def clean_finances(df, column_name):
+    df[column_name] = df[column_name].str.replace('(', '-')
+    df[column_name] = df[column_name].str.replace(',', '')
+    df[column_name] = df[column_name].str.replace(')', '')
+    df[column_name] = df[column_name].astype('float64')
+    return df[column_name]
 
 
 class YearlyReport:
@@ -60,17 +69,18 @@ class YearlyReport:
     def get_sheet_df(self, data_range):
         result = self.sheet.values().get(spreadsheetId=self.sheet_id, range=data_range).execute()
         data_list = result.get('values', [])
-        return pd.DataFrame(data_list[1:], columns=data_list[0])
+        df = pd.DataFrame(data_list[1:], columns=data_list[0])
+        return df.replace('', np.nan)
 
     def set_monthly_reports(self):
-        data_range = "Balances!A1:F"
+        data_range = "Balances!A1:H"
         balance_summary_df = self.get_sheet_df(data_range)
 
         self.balances_df = balance_summary_df
         self.monthly_reports = balance_summary_df.to_dict('records')
 
     def set_summary_df(self):
-        data_range = "Summary!A1:F"
+        data_range = "Summary!A1:J"
         spending_summary_df = self.get_sheet_df(data_range)
 
         self.summary_df = spending_summary_df
@@ -82,33 +92,17 @@ class YearlyReport:
 
         grouped_spending_df = self.summary_df.groupby(MONTH_KEY)
         current_projections = grouped_spending_df.get_group(current_month)
-        self.current_projections_df = current_projections.set_index(CATEGORY_KEY)
+        current_projections = current_projections.drop([MONTH_KEY], axis=1).set_index(SUMMARY_KEY)
+        current_projections = current_projections.ffill()
+        current_projections_t = current_projections.transpose().reset_index(drop=False)
+        current_projections_t = current_projections_t.rename(columns={'index': CATEGORY_KEY})
 
-    def update_summary_sheet(self):
-        current_month = get_current_month()
-        current_day = float(datetime.today().day)
-        monthly_statement = Statement(current_month, self)
+        self.current_projections_df = current_projections_t
+        self.current_projection = current_projections_t.to_dict('records')
+        self.budget = current_projections_t[[CATEGORY_KEY, BUDGET_KEY]].to_dict('records')
 
-        current_projection = self.current_projections_df
-        monthly_statement_summary = monthly_statement.summary_df[[COST_KEY]]
-
-        for index, row in monthly_statement_summary.iterrows():
-            spent = round(float(row[COST_KEY]), 2)
-            monthly_statement_summary.loc[index, SPENDING_TOTAL_KEY] = spent
-            try:
-                budget = float(current_projection.loc[index, BUDGET_KEY])
-                monthly_statement_summary.loc[index, BUDGET_KEY] = round(budget, 2)
-                monthly_statement_summary.loc[index, BUDGET_REMAINDER] = round(budget - spent, 2)
-            except Exception as e:
-                monthly_statement_summary.loc[index, BUDGET_KEY] = np.nan
-                monthly_statement_summary.loc[index, BUDGET_REMAINDER] = np.nan
-            monthly_statement_summary.loc[index, PROJECTED_SPENDING] = round((spent * 30) / current_day, 2)
-
-        re_indexed_projection_df = monthly_statement_summary.reset_index(drop=False)
-        re_indexed_budget_df = current_projection[[BUDGET_KEY]].reset_index(drop=False)
-
-        self.budget = re_indexed_budget_df.to_dict('records')
-        self.current_projection = re_indexed_projection_df.to_dict('records')
+    def set_projection(self):
+        return 0
 
 
 class Statement:
@@ -125,9 +119,12 @@ class Statement:
         self.get_sheet_data()
 
     def get_sheet_data(self):
-        data_range = "{}!A1:H".format(self.month)
+        data_range = "Transactions!A1:I"
         transactions_df = self.yearly_report.get_sheet_df(data_range)
-        transactions_df.loc[:, COST_KEY] = transactions_df[COST_KEY].astype('float64')
+        transactions_df = transactions_df.set_index(MONTH_KEY)
+        transactions_df[COST_KEY] = clean_finances(transactions_df, COST_KEY)
+
+        print(transactions_df)
 
         self.transactions_df = transactions_df
         self.transactions_json = transactions_df.to_dict('records')

@@ -16,7 +16,6 @@ def get_yearly_report():
     sheet_id = session['sheet_id']
     service = build_drive_api_v3()
     yearly_report = YearlyReport(service, sheet_id)
-    yearly_report.update_summary_sheet()
     return yearly_report
 
 
