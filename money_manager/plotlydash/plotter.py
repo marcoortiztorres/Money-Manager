@@ -8,8 +8,10 @@ from money_manager.google_drive.objects import *
 def create_plot(transactions_json, category):
     transactions_df = pd.DataFrame(transactions_json)
     categorised_df = transactions_df[transactions_df[CATEGORY_KEY] == category]
-
-    figure = get_pie_graph_figure(categorised_df[SUB_CATEGORY_KEY].to_list(), categorised_df[COST_KEY].to_list())
+    if categorised_df.empty:
+        figure = get_pie_graph_figure(transactions_df[CATEGORY_KEY].to_list(), transactions_df[COST_KEY].to_list())
+    else:
+        figure = get_pie_graph_figure(categorised_df[SUB_CATEGORY_KEY].to_list(), categorised_df[COST_KEY].to_list())
 
     graphJSON = json.dumps(figure, cls=plotly.utils.PlotlyJSONEncoder)
 
@@ -20,10 +22,14 @@ def create_average_description_pie(transactions_json, category):
     mean_key = 'mean'
     transactions_df = pd.DataFrame(transactions_json)
     categorised_df = transactions_df[transactions_df[CATEGORY_KEY] == category]
-    categorised_df_summary = categorised_df.groupby(SUB_CATEGORY_KEY).describe()[COST_KEY]
-
-    figure = get_pie_graph_figure(categorised_df_summary.index.values.tolist(),
-                                  categorised_df_summary[mean_key].to_list())
+    if categorised_df.empty:
+        categorised_df_summary = transactions_json.groupby(CATEGORY_KEY).describe()[COST_KEY]
+        figure = get_pie_graph_figure(categorised_df_summary.index.values.tolist(),
+                                      categorised_df_summary[mean_key].to_list())
+    else:
+        categorised_df_summary = categorised_df.groupby(SUB_CATEGORY_KEY).describe()[COST_KEY]
+        figure = get_pie_graph_figure(categorised_df_summary.index.values.tolist(),
+                                      categorised_df_summary[mean_key].to_list())
 
     graphJSON = json.dumps(figure, cls=plotly.utils.PlotlyJSONEncoder)
 

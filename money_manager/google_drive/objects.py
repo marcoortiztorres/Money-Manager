@@ -38,10 +38,11 @@ def get_current_month():
     current_date = datetime.now()
     return current_date.strftime("%B")
 
+
 def clean_finances(df, column_name):
-    df[column_name] = df[column_name].str.replace('(', '-')
-    df[column_name] = df[column_name].str.replace(',', '')
-    df[column_name] = df[column_name].str.replace(')', '')
+    df[column_name] = df[column_name].str.replace('(', '-', regex=True)
+    df[column_name] = df[column_name].str.replace(',', '', regex=True)
+    df[column_name] = df[column_name].str.replace(')', '', regex=True)
     df[column_name] = df[column_name].astype('float64')
     return df[column_name]
 
@@ -90,16 +91,16 @@ class YearlyReport:
     def set_current_projection(self):
         current_month = get_current_month()
 
-        grouped_spending_df = self.summary_df.groupby(MONTH_KEY)
+        summary_df = self.summary_df.ffill()
+        grouped_spending_df = summary_df.groupby(MONTH_KEY)
         current_projections = grouped_spending_df.get_group(current_month)
-        current_projections = current_projections.drop([MONTH_KEY], axis=1).set_index(SUMMARY_KEY)
-        current_projections = current_projections.ffill()
-        current_projections_t = current_projections.transpose().reset_index(drop=False)
-        current_projections_t = current_projections_t.rename(columns={'index': CATEGORY_KEY})
+        indexed_projections = current_projections.drop([MONTH_KEY], axis=1).set_index(SUMMARY_KEY)
+        transposed_projections = indexed_projections.transpose()
+        re_indexed_projections = transposed_projections.reset_index(drop=False).rename(columns={'index': CATEGORY_KEY})
 
-        self.current_projections_df = current_projections_t
-        self.current_projection = current_projections_t.to_dict('records')
-        self.budget = current_projections_t[[CATEGORY_KEY, BUDGET_KEY]].to_dict('records')
+        self.current_projections_df = re_indexed_projections
+        self.current_projection = re_indexed_projections.to_dict('records')
+        self.budget = re_indexed_projections[[CATEGORY_KEY, BUDGET_KEY]].to_dict('records')
 
     def set_projection(self):
         return 0
@@ -121,15 +122,15 @@ class Statement:
     def get_sheet_data(self):
         data_range = "Transactions!A1:I"
         transactions_df = self.yearly_report.get_sheet_df(data_range)
-        transactions_df = transactions_df.set_index(MONTH_KEY)
         transactions_df[COST_KEY] = clean_finances(transactions_df, COST_KEY)
 
-        print(transactions_df)
+        month_transactions = transactions_df[transactions_df[MONTH_KEY] == self.month]
+        clean_string_df = month_transactions.fillna('')
 
-        self.transactions_df = transactions_df
-        self.transactions_json = transactions_df.to_dict('records')
+        self.transactions_df = clean_string_df
+        self.transactions_json = clean_string_df.to_dict('records')
 
-        totals_df = transactions_df.groupby(CATEGORY_KEY).agg({COST_KEY: "sum"})
+        totals_df = clean_string_df.groupby(CATEGORY_KEY).agg({COST_KEY: "sum"})
         totals_df = totals_df.sort_values(by=COST_KEY, ascending=False, na_position='last')
         summary_df = transactions_df.groupby(CATEGORY_KEY).describe()[COST_KEY]
         df_merged = pd.merge(totals_df, summary_df, left_index=True, right_index=True, how='inner')
